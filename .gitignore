@@ -1,0 +1,12 @@
+dummy.txt
+TravelgeekApp/settings.py
+examples.py
+webpack.config.js
+webpack-stats.json
+static
+media
+node_modules
+*.pyc
+package-lock.json
+.idea
+.vscode
