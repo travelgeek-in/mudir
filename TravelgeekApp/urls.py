@@ -14,9 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url
-from django.conf.urls import handler404, handler403
-from django.conf.urls.static import static
-from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
+from rest_framework_jwt.views import ObtainJSONWebToken, refresh_jwt_token
 
 
 from providers.views import *
@@ -24,7 +22,8 @@ from logins.views import *
 
 urlpatterns = [
     url('^$', home),
-    url(r'^login/$', obtain_jwt_token),
+    # url(r'^login/$', obtain_jwt_token),
+    url(r'^login/$', ObtainJSONWebToken.as_view(serializer_class=CustomJWTSerializer)),
     url(r'^getUser/$', get_user),
     url(r'^createUser/$', create_company_user),
     url(r'^createProvider/$', create_provider),

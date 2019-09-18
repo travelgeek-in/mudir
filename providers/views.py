@@ -1,10 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
-from django.shortcuts import render
-from models import *
-from Utils.regex import *
-from Utils.permissions import *
 from rest_framework.decorators import api_view, permission_classes, renderer_classes
 from rest_framework.response import Response
 from rest_framework import status
@@ -13,6 +8,16 @@ from serializers import *
 import jwt
 from rest_framework.renderers import JSONRenderer
 from django.db import transaction
+from django.contrib.auth import get_user_model, authenticate
+from rest_framework_jwt.serializers import JSONWebTokenSerializer
+from rest_framework_jwt.settings import api_settings
+from rest_framework_jwt.compat import get_username_field, PasswordField
+
+
+jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+jwt_decode_handler = api_settings.JWT_DECODE_HANDLER
+jwt_get_username_from_payload = api_settings.JWT_PAYLOAD_GET_USERNAME_HANDLER
 
 
 def _create_company_user(data):
@@ -36,9 +41,8 @@ def _create_company_user(data):
 def create_company_user(request):
     try:
         data = request.data
-        user = User.objects.create_user(username=data['username'], email=data['email'], password=data['password'],
-                                        first_name=data['first_name'])
-        data['userId'] = user.id
+        user = create_user(data)
+        data['userId'] = user.userId
         company_user = _create_company_user(data)
         if isinstance(company_user, CompanyUser):
             return Response(status=status.HTTP_200_OK)
@@ -46,6 +50,30 @@ def create_company_user(request):
             Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     except Exception as e:
         return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+def create_user(data):
+    try:
+        req_data = data
+        serialized = UserSerializer(data=req_data)
+        if serialized.is_valid():
+            get_user_model().objects.create_user(username=req_data['username'], password=req_data['password'],
+                                                 contact=req_data['contact'],email=req_data['email'],
+                                                 role=req_data['role'], first_name=req_data['first_name'],
+                                                 middle_name=req_data['middle_name'], last_name=req_data['last_name'])
+            user_object = get_user_model().objects.get(username=req_data['username'])
+            return user_object
+        else:
+            return str(serialized._errors())
+    except Exception as e:
+        return str(e)
+
+
+@renderer_classes((JSONRenderer,))
+def get_user(request):
+    token = request.META.get('HTTP_AUTHORIZATION').split(' ')[1]
+    token_payload = jwt.decode(token, None, None)
+    return Response(token_payload)
 
 
 @api_view(['POST'])
@@ -93,16 +121,17 @@ def create_provider(request):
             data_['profilePicture'] = data['profilePicture']
             data_['isAdmin'] = data['isAdmin']
             data_['role'] = 2 if data_['isAdmin'] else 1
-            user = User.objects.create_user(username=data['username'], email=data['email'], password=data['password']
-                                            , first_name=data['first_name'])
+            user = create_user(data_)
             if isinstance(user, User):
-                data_['userId'] = user.id
+                data_['userId'] = user.userId
                 data_['providerId'] = provider_obj.companyId
 
                 # CREATE ADMIN USER
                 company_user = _create_company_user(data_)
 
                 # send confirmation email
+            else:
+                raise RuntimeError
 
         return Response(status=status.HTTP_200_OK)
     except Exception as e:
@@ -116,3 +145,51 @@ def get_user(request):
     token_payload = jwt.decode(token, None, None)
     return Response(token_payload)
 
+
+class CustomJWTSerializer(JSONWebTokenSerializer):
+    username_field = 'username_or_email'
+
+    def __init__(self, *args, **kwargs):
+        """
+        Dynamically add the USERNAME_FIELD to self.fields.
+        """
+        super(JSONWebTokenSerializer, self).__init__(*args, **kwargs)
+
+        self.fields[self.username_field] = serializers.CharField()
+        self.fields['password'] = PasswordField(write_only=True)
+
+    def validate(self, attrs):
+
+        password = attrs.get("password")
+        user_obj = User.objects.filter(email=attrs.get("username_or_email")).first() or User.objects.filter(
+            username=attrs.get("username_or_email")).first()
+        if user_obj is not None:
+            credentials = {
+                'username': user_obj.username,
+                'password': password
+            }
+            if all(credentials.values()):
+                user = authenticate(**credentials)
+                if user:
+                    if not user.is_active:
+                        msg = _('User account is disabled.')
+                        raise serializers.ValidationError(msg)
+
+                    payload = jwt_payload_handler(user)
+
+                    return {
+                        'token': jwt_encode_handler(payload),
+                        'user': user
+                    }
+                else:
+                    msg = _('Unable to log in with provided credentials.')
+                    raise serializers.ValidationError(msg)
+
+            else:
+                msg = _('Must include "{username_field}" and "password".')
+                msg = msg.format(username_field=self.username_field)
+                raise serializers.ValidationError(msg)
+
+        else:
+            msg = _('Account with this email/username does not exists')
+            raise serializers.ValidationError(msg)

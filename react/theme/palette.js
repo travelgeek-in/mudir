@@ -54,5 +54,8 @@ export default {
     paper: white
   },
   border: '#DFE3E8',
-  divider: '#DFE3E8'
+  divider: '#DFE3E8',
+  custom: {
+    dark:'#1a1b1f',
+  }
 };

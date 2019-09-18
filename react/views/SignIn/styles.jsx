@@ -12,12 +12,11 @@ export default theme => ({
     }
   },
   quote: {
-    backgroundColor: theme.palette.common.neutral,
+    backgroundColor: theme.palette.custom.dark,
     height: '100%',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundImage: 'url(/static/images/sign_up_1.jpg)',
     backgroundSize: 'cover',
     backgroundRepeat: 'no-repeat',
     backgroundPosition: 'center'
