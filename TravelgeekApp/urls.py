@@ -15,8 +15,6 @@ Including another URLconf
 """
 from django.conf.urls import url
 from rest_framework_jwt.views import ObtainJSONWebToken, refresh_jwt_token
-
-
 from providers.views import *
 from logins.views import *
 
