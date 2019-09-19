@@ -17,64 +17,64 @@ import { Portlet, PortletContent, PortletFooter } from '../../../../components';
 import styles from './styles';
 
 class AccountProfile extends Component {
-  render() {
-    const { classes, className, ...rest } = this.props;
+    render() {
+        const { classes, className, ...rest } = this.props;
 
-    const rootClassName = classNames(classes.root, className);
+        const rootClassName = classNames(classes.root, className);
 
-    return (
-      <Portlet
-        {...rest}
-        className={rootClassName}
-      >
-        <PortletContent>
-          <div className={classes.details}>
-            <div className={classes.info}>
-              <Typography variant="h2">John Doe</Typography>
-              <Typography
-                className={classes.locationText}
-                variant="body1"
-              >
-                Rm. Valcea, Romania
-              </Typography>
-              <Typography
-                className={classes.dateText}
-                variant="body1"
-              >
-                4:32PM (GMT-4)
-              </Typography>
-            </div>
-            <Avatar
-              className={classes.avatar}
-              src="/static/images/avatars/avatar_1.png"
-            />
-          </div>
-          <div className={classes.progressWrapper}>
-            <Typography variant="body1">Profile Completeness: 70%</Typography>
-            <LinearProgress
-              value={70}
-              variant="determinate"
-            />
-          </div>
-        </PortletContent>
-        <PortletFooter>
-          <Button
-            className={classes.uploadButton}
-            color="primary"
-            variant="text"
-          >
-            Upload picture
-          </Button>
-          <Button variant="text">Remove picture</Button>
-        </PortletFooter>
-      </Portlet>
-    );
-  }
+        return (
+            <Portlet
+                {...rest}
+                className={rootClassName}
+            >
+                <PortletContent>
+                    <div className={classes.details}>
+                        <div className={classes.info}>
+                            <Typography variant="h2">John Doe</Typography>
+                            <Typography
+                                className={classes.locationText}
+                                variant="body1"
+                            >
+                                Rm. Valcea, Romania
+                            </Typography>
+                            <Typography
+                                className={classes.dateText}
+                                variant="body1"
+                            >
+                                4:32PM (GMT-4)
+                            </Typography>
+                        </div>
+                        <Avatar
+                            className={classes.avatar}
+                            src="/static/images/avatars/avatar_1.png"
+                        />
+                    </div>
+                    <div className={classes.progressWrapper}>
+                        <Typography variant="body1">Profile Completeness: 70%</Typography>
+                        <LinearProgress
+                            value={70}
+                            variant="determinate"
+                        />
+                    </div>
+                </PortletContent>
+                <PortletFooter>
+                    <Button
+                        className={classes.uploadButton}
+                        color="primary"
+                        variant="text"
+                    >
+                        Upload picture
+                    </Button>
+                    <Button variant="text">Remove picture</Button>
+                </PortletFooter>
+            </Portlet>
+        );
+    }
 }
 
 AccountProfile.propTypes = {
-  className: PropTypes.string,
-  classes: PropTypes.object.isRequired
+    className: PropTypes.string,
+    classes: PropTypes.object.isRequired
 };
 
 export default withStyles(styles)(AccountProfile);
