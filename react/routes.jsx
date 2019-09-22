@@ -31,6 +31,11 @@ const Dashboard = Loadable({
     loading: Loading
 });
 
+const Tour = Loadable({
+    loader:() => import('./views/TourManagement'),
+    loading: Loading
+});
+
 const ProductList = Loadable({
     loader:() => import('./views/ProductList'),
     loading: Loading
@@ -86,6 +91,7 @@ routes = [
     { path: '/account', exact: true, name: 'Account', component: Account },
     { path: '/settings', exact: true, name: 'Settings', component: Settings },
     { path: '/sign-up', exact: true, name: 'Sign Up', component: SignUp },
+    { path: '/tripManagement', exact: true, name: 'Tour Management', component: Tour },
     { path: '/sign-in', exact: true, name: 'Sign In', component: SignIn },
     { path: '/under-development', exact: true, name: 'Under Development', component: UnderDevelopment },
     { path: '/not-found', exact: true, name: 'Not Found', component: NotFound },

@@ -20,7 +20,7 @@ import {
 
 import { ArrowBack as ArrowBackIcon } from '@material-ui/icons';
 
-import { Facebook as FacebookIcon, Google as GoogleIcon } from '../../icons';
+// import { Facebook as FacebookIcon, Google as GoogleIcon } from '../../icons';
 
 import styles from './styles';
 
@@ -135,7 +135,7 @@ class SignIn extends Component {
                                     className={classes.quoteText}
                                     variant="h1"
                                 >
-                                    Software For Travel companies Firms That Want To Grow Faster.
+                                    Software For Travel Companies That Want To Grow Faster.
                                 </Typography>
                                 <div className={classes.imageWrapper}>
                                     <img
